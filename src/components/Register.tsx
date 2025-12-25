@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Phone, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
@@ -29,19 +30,7 @@ const Register = () => {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Registration failed');
-      }
+      await axios.post('/api/auth/register', formData);
 
       // Auto-login and redirect
       const result = await signIn('credentials', {
@@ -57,7 +46,7 @@ const Register = () => {
         router.push('/home');
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

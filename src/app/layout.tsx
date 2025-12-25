@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Provider from "@/Provider";
 import "./globals.css";
+import StoreProvider from "@/redux/StoreProvider";
+import InitUser from "@/InitUser";
 
 
 export const metadata: Metadata = {
@@ -20,7 +22,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Provider>
+          <StoreProvider>
+            <InitUser/>
             {children}
+          </StoreProvider>
         </Provider>
       </body>
     </html>

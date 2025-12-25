@@ -9,7 +9,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
         clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        authorization: {
+          params: {
+            prompt: "consent",
+            access_type: "offline",
+            response_type: "code"
+          }
+        }
     }),
     Credentials({
         credentials: {
@@ -66,12 +73,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return true; 
     },
     // token ke ander user ka data daalta hai
-    async jwt({token, user}: any){
+    async jwt({token, user, trigger, session}: any){
         if(user){
             token.id = user.id;
             token.name = user.name;
             token.email = user.email;
             token.role = user.role;
+        }
+        if(!token.id || (token.id as string).length !== 24){
+             await dbConnect();
+             const dbUser = await User.findOne({email:token.email});
+             if(dbUser){
+                token.id = dbUser._id.toString();
+                token.role = dbUser.role;
+             }
+        }
+        if(trigger === "update"){
+            token.role = session.role;
         }
         return token;
     },
@@ -93,5 +111,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy:"jwt",
     maxAge: 10 * 24 * 60 * 60 // 10 days
   },
-  secret: process.env.NEXTAUTH_SECRET
+  secret: process.env.AUTH_SECRET
 })
