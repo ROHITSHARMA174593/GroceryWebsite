@@ -1,4 +1,5 @@
 "use client";
+
 import { RootState } from "@/redux/store";
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -11,8 +12,10 @@ import {
   incrementQuantity,
   removeFromCart,
 } from "@/redux/cartslice";
+import { useRouter } from "next/navigation";
 
 const CartPage = () => {
+  const router = useRouter();
   const { cartData } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch();
 
@@ -152,7 +155,9 @@ const CartPage = () => {
                   </div>
                 </div>
 
-                <button className="w-full bg-[#00a63a] hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all active:scale-95 mb-4">
+                <button
+                onClick={() => router.push("/user/checkout")}                
+                className="w-full bg-[#00a63a] hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all active:scale-95 mb-4">
                   Proceed to Checkout
                 </button>
 
