@@ -9,8 +9,8 @@ export async function proxy(req:NextRequest){
     }
 
     const token = await getToken({req, secret:process.env.AUTH_SECRET})
-    console.log(token)
-    console.log(req.url)
+    console.log(token) // terminal me continously token print karne ke liye (user details (name, email, role, picture))
+    console.log(req.url) // terminal me continously URL print karne ke liye ki hum currently konse url per hai 
     if(!token){
         const loginUrl = new URL("/login", req.url)
         // console.log(loginUrl)

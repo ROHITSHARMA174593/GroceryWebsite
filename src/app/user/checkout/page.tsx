@@ -21,6 +21,7 @@ import { RootState } from "@/redux/store";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
+import image from "next/image";
 const MapView = dynamic(() => import("@/components/MapView"), {
   ssr: false,
   loading: () => (
@@ -152,6 +153,48 @@ const Checkout = () => {
       setPosition([y, x]);
     }
   };
+
+  //todo : Handle Payment APIs
+  const handleCOD = async () => {
+    try {
+      const res = await axios.post("/api/user/order", {
+        userId: userData?._id,
+        items: cartData.map((item) => {
+          return {
+                    grocery: item._id,
+                    name: item.name,
+                    price: item.price,
+                    unit: item.unit,
+                    image: item.image,
+                    quantity: item.quantity
+                  }
+        }),
+        paymentMethod,
+        totalAmount: finalTotal,
+        address:{
+          fullName: address.fullName,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          mobile: address.mobile,
+          fullAddress: address.fullAddress,
+          latitude: position[0],
+          longitude: position[1]
+        }
+      })
+      // console.log("Order Created : \n",res.data)
+      router.push("/user/order-success")
+    } catch (err) {
+      console.log(err)  
+    }
+  }
+  const handleOnline = async () => {
+    try {
+      
+    } catch (err) {
+      
+    }
+  }
 
   return (
     <div className="w-[92%] md:w-[80%] mx-auto py-10 relative">
@@ -366,7 +409,14 @@ const Checkout = () => {
 
             <motion.button
               whileTap={{scale:0.93}} 
-              className="w-full bg-green-600 text-white p-5 rounded-lg hover:bg-green-700 transition-all font-semibold"
+              className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition-all font-semibold"
+              onClick={() => {
+                if(paymentMethod === "cod"){
+                  handleCOD();
+                }else{
+                  handleOnline();
+                }
+              }}
             >
               {paymentMethod === "cod" ? "Place Order" : "Pay Now"}
             </motion.button>
